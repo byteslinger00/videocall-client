@@ -35,13 +35,14 @@ function MainWindow({ startCall }) {
     <div className="container main-window">
       <div>
         <h3>
-          Hi, your ID is
-          <input
+          Hi, your ID is<br/>{clientID}
+          {/* <input
             type="text"
             className="txt-clientId"
             defaultValue={clientID}
             readOnly
-          />
+          /> */}
+          
         </h3>
         <h4>Get started by calling a friend below</h4>
       </div>
