@@ -31,6 +31,7 @@ function App() {
   const [config, setConfig] = useState(null);
 
   useEffect(()=>{
+    console.log('created')
     socket
       .on('request', ({ from: callFrom }) => {
         // this.setState({ callModal: 'active', callFrom });
@@ -49,6 +50,7 @@ function App() {
         socket.off("request").off("call").off("end");
       }
   },[])
+  useEffect(()=>{console.log(pc)},[pc])
 //   componentDidMount() {
     
 //   }
