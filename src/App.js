@@ -27,7 +27,8 @@ function App() {
   const [callFrom, setCallFrom] = useState('');
   const [localSrc, setLocalSrc] = useState(null);
   const [peerSrc, setPeerSrc] = useState(null);
-  const [pc, setPc] = useState({});
+  // const [pc, setPc] = useState({});
+  var pc = {};
   const [config, setConfig] = useState(null);
 
   useEffect(()=>{
@@ -58,7 +59,7 @@ function App() {
   const startCall = (isCaller, friendID, config) => {
     // this.config = config;
     setConfig(config);
-    const pc = new PeerConnection(friendID)
+    pc = new PeerConnection(friendID)
       .on('localStream', (src) => {
         setCallWindow('active');
         setLocalSrc(src);
@@ -69,7 +70,7 @@ function App() {
       })
       .on('peerStream', (src) => setPeerSrc(src))
       .start(isCaller);
-    setPc(pc);
+    // setPc(pc);
   }
 
   const rejectCall = () =>{
@@ -81,8 +82,8 @@ function App() {
     if (_.isFunction(pc.stop)) {
       pc.stop(isStarter);
     }
-    // this.pc = {};
-    setPc({});
+    pc = {};
+    // setPc({});
     // this.config = null;
     setConfig(null);
     // this.setState({
@@ -116,7 +117,7 @@ function App() {
           startCall={startCall}
           rejectCall={rejectCall}
           callFrom={callFrom}
-        />
+       />
       </div>
     );
 }
