@@ -1,6 +1,10 @@
 import React, { Component, useEffect, useState } from 'react';
 import _ from 'lodash';
-import { socket, PeerConnection } from './communication';
+// import { socket, PeerConnection } from './communication';
+import {socket} from './communication';
+// import {PeerConnection} from './communication';
+import {pc} from './pc';
+import { startCallPc } from './pc';
 import MainWindow from './components/MainWindow';
 import CallWindow from './components/CallWindow';
 import CallModal from './components/CallModal';
@@ -27,7 +31,7 @@ function App() {
   const [callFrom, setCallFrom] = useState('');
   const [localSrc, setLocalSrc] = useState(null);
   const [peerSrc, setPeerSrc] = useState(null);
-  const [pc, setPc] = useState({});
+  // const [pc, setPc] = useState({});
   // var pc = {};
   const [config, setConfig] = useState(null);
 
@@ -40,19 +44,27 @@ function App() {
         setCallFrom(callFrom);
       })
       .on('call', (data) => {
-        alert('calling')
+        // alert('calling')
+        console.log(pc);
         if (data.sdp) {
-          pc.setRemoteDescription(data.sdp);
-          if (data.sdp.type === 'offer') pc.createAnswer();
-        } else pc.addIceCandidate(data.candidate);
+          pc?.setRemoteDescription(data.sdp);
+          if (data.sdp.type === 'offer') pc?.createAnswer();
+        } else pc?.addIceCandidate(data.candidate);
       })
       .on('end', () => endCall(false))
       .emit('init');
       return() => {
-        socket.off("request").off("call").off("end");
+        socket.off("request");
+        socket.off("call");
+        socket.off("end");
       }
   },[])
-  useEffect(()=>{console.log(pc)},[pc])
+
+  useEffect(()=>{
+    console.log('Peer changed:');
+    console.log(pc)
+  },[pc])
+
 //   componentDidMount() {
     
 //   }
@@ -60,18 +72,20 @@ function App() {
   const startCall = (isCaller, friendID, config) => {
     // this.config = config;
     setConfig(config);
-    const pc = new PeerConnection(friendID)
-      .on('localStream', (src) => {
-        setCallWindow('active');
-        setLocalSrc(src);
-        if(!isCaller) setCallModal('');
-        // const newState = { callWindow: 'active', localSrc: src };
-        // if (!isCaller) newState.callModal = '';
-        // this.setState(newState);
-      })
-      .on('peerStream', (src) => setPeerSrc(src))
-      .start(isCaller);
-    setPc(pc);
+    startCallPc(isCaller, friendID, setCallWindow,setLocalSrc, setCallModal, setPeerSrc)
+    // const pc = new PeerConnection(friendID)
+    //   .on('localStream', (src) => {
+    //     setCallWindow('active');
+    //     setLocalSrc(src);
+    //     if(!isCaller) setCallModal('');
+    //     // const newState = { callWindow: 'active', localSrc: src };
+    //     // if (!isCaller) newState.callModal = '';
+    //     // this.setState(newState);
+    //   })
+    //   .on('peerStream', (src) => setPeerSrc(src))
+    //   .start(isCaller);
+    // // pc.off("localStream").off("peerStream");
+    // setPc(pc);
   }
 
   const rejectCall = () =>{
@@ -80,19 +94,11 @@ function App() {
   }
 
   const endCall = (isStarter) => {
-    if (_.isFunction(pc.stop)) {
-      pc.stop(isStarter);
+    if (_.isFunction(pc?.stop)) {
+      pc?.stop(isStarter);
     }
-    // pc = {};
-    setPc({});
-    // this.config = null;
+    // setPc({});
     setConfig(null);
-    // this.setState({
-    //   callWindow: '',
-    //   callModal: '',
-    //   localSrc: null,
-    //   peerSrc: null
-    // });
     setCallWindow('');
     setCallModal('');
     setLocalSrc(null);
@@ -109,7 +115,7 @@ function App() {
             localSrc={localSrc}
             peerSrc={peerSrc}
             config={config}
-            mediaDevice={pc.mediaDevice}
+            mediaDevice={pc?.mediaDevice}
             endCall={endCall}
           />
         ) }
